@@ -1,5 +1,6 @@
 package ru.netology;
 
+import java.util.Objects;
 import java.util.OptionalInt;
 
 public class Person {
@@ -12,16 +13,16 @@ public class Person {
     public Person(String name, String surname) {
         this.name = name;
         this.surname = surname;
+        this.age = OptionalInt.empty();
     }
 
     public Person(String name, String surname, OptionalInt age) {
-        this.name = name;
-        this.surname = surname;
+        this(name, surname);
         this.age = age;
     }
 
     public PersonBuilder newChildBuilder() {
-        return null;
+        return new PersonBuilder().setSurname(surname).setAge(0).setAddress(address);
     }
 
     public boolean hasAge() {
@@ -29,7 +30,7 @@ public class Person {
     }
 
     public boolean hasAddress() {
-        return address.isEmpty();
+        return address != null;
     }
 
     public String getName() {
@@ -48,13 +49,33 @@ public class Person {
         return address;
     }
 
-    public void setAddress(String address) { /*...*/ }
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-    public void happyBirthday() { /*...*/ }
+    public void happyBirthday() {
+        if (age.isPresent()) {
+            age = OptionalInt.of(age.getAsInt() + 1);
+        }
+    }
 
     @Override
-    public String toString() { /*...*/ }
+    public String toString() {
+        return name + " " + surname +
+                ", " + (age.isPresent() ? age.getAsInt() : " ") +
+                ", " + address + "\n";
+    }
 
     @Override
-    public int hashCode() { /*...*/ }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return name.equals(person.name) && surname.equals(person.surname) && Objects.equals(age, person.age) && Objects.equals(address, person.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, surname, age, address);
+    }
 }
